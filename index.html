@@ -323,6 +323,24 @@
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 14px 30px -10px rgba(155, 92, 246, .7)
     }
 
+    .btn-c {
+      background: linear-gradient(135deg, #10e08a 0%, #00d9c0 55%, #2ee6ff 100%);
+      color: #04140f;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 12px 28px -10px rgba(16, 224, 138, .65)
+    }
+
+    .btn-c .ic {
+      color: #04140f
+    }
+
+    @media(hover:hover) {
+      .btn-c:hover {
+        filter: brightness(1.1);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 16px 34px -10px rgba(0, 229, 200, .8)
+      }
+    }
+
     .btn-w {
       background: var(--selbg);
       color: var(--selink);
@@ -872,9 +890,16 @@
     }
 
     .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: 50px;
+      gap: 10px
+    }
+
+    @media(min-width:560px) {
+      .chips {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))
+      }
     }
 
     .chip {
@@ -882,13 +907,25 @@
       isolation: isolate;
       overflow: hidden;
       border: 0;
-      padding: 9px 15px;
-      border-radius: 999px;
-      font-size: .84rem;
+      height: 100%;
+      padding: 0 8px;
+      border-radius: 16px;
+      font-size: .86rem;
+      font-weight: 500;
+      line-height: 1.15;
+      white-space: nowrap;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       background: var(--fill);
       box-shadow: inset 0 0 0 1px var(--line);
       color: var(--ink);
-      transition: color .3s, transform .4s var(--ease), background-color .25s
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: color .3s, transform .4s var(--ease), background-color .25s, box-shadow .3s
     }
 
     .chip::before {
@@ -899,13 +936,13 @@
       border-radius: inherit;
       background: var(--selbg);
       opacity: 0;
-      transform: scale(.8);
-      transition: opacity .3s, transform .45s var(--ease)
+      transform: scale(.9);
+      transition: opacity .25s, transform .35s var(--ease)
     }
 
     .chip[aria-pressed=true] {
       color: var(--selink);
-      font-weight: 500
+      box-shadow: 0 10px 18px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .35)
     }
 
     .chip[aria-pressed=true]::before {
@@ -950,7 +987,7 @@
       font-weight: 600
     }
 
-    .buy .btn-w {
+    .buy .btn-c {
       flex: 1 1 160px;
       min-width: 0;
       padding: 0 16px;
@@ -2357,9 +2394,7 @@
         </div>
         <div class="seg" id="seg"></div>
         <div class="pdp">
-          <div class="gal glass"><img id="gi" alt="">
-            <div class="tagp mono">Premium • Zero compromise</div>
-          </div>
+          <div class="gal glass"><img id="gi" alt=""></div>
           <div class="pinfo glass" id="pi"></div>
         </div>
       </section>
@@ -2559,7 +2594,7 @@
       if (!ni) $("#gi").src = pimg(p, oi); $("#gi").alt = p.n;
       $("#pi").innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center"><span class="mono pink">' + p.cat + '</span><button class="dsq" id="wb" aria-label="Save to wishlist" aria-pressed="' + w + '" style="' + (w ? "color:var(--pink)" : "") + '"><svg class="ic" style="' + (w ? "fill:currentColor" : "") + '"><use href="#i-heart"/></svg></button></div><h2 class="disp gtext">' + p.n + '</h2><div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span class="price">' + tk(p.p) + '</span><span class="stock mono"><i></i>In stock · Ready to dispatch</span></div><p class="mute" style="line-height:1.65">' + p.d + "</p>" +
         (p.opts ? '<div><div class="mono mute" style="margin-bottom:10px">Choose fragrance</div><div class="chips" id="chips">' + p.opts.map(function (o, i) { return '<button class="chip" data-o="' + i + '" aria-pressed="' + (i == oi) + '">' + o + "</button>" }).join("") + "</div></div>" : "") +
-        '<div class="buy"><div class="qty"><button class="qb" id="qm" aria-label="Less"><svg class="ic"><use href="#i-minus"/></svg></button><output id="qv">' + qty + '</output><button class="qb" id="qp" aria-label="More"><svg class="ic"><use href="#i-plus"/></svg></button></div><button class="btn btn-w" id="add"><svg class="ic"><use href="#i-bag"/></svg>Add to cart</button></div><button class="btn btn-g" id="inst" style="width:100%">Instant 1-click checkout</button><ul class="feat"><li><svg class="ic"><use href="#i-check"/></svg>Cash on delivery, bKash &amp; Nagad</li><li><svg class="ic"><use href="#i-check"/></svg>30-day easy returns</li></ul>'
+        '<div class="buy"><div class="qty"><button class="qb" id="qm" aria-label="Less"><svg class="ic"><use href="#i-minus"/></svg></button><output id="qv">' + qty + '</output><button class="qb" id="qp" aria-label="More"><svg class="ic"><use href="#i-plus"/></svg></button></div><button class="btn btn-c" id="add"><svg class="ic"><use href="#i-bag"/></svg>Add to cart</button></div><button class="btn btn-g" id="inst" style="width:100%">Instant 1-click checkout</button><ul class="feat"><li><svg class="ic"><use href="#i-check"/></svg>Cash on delivery, bKash &amp; Nagad</li><li><svg class="ic"><use href="#i-check"/></svg>30-day easy returns</li></ul>'
     }
     var RM = window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches, EZ = "cubic-bezier(.2,.9,.3,1)";
     function swapImg(el, src, dir) {
