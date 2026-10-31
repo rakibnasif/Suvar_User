@@ -945,6 +945,16 @@
       transition: opacity .25s, transform .35s var(--ease)
     }
 
+    .chip.wl::after {
+      content: "♥";
+      position: absolute;
+      top: 3px;
+      right: 8px;
+      font-size: .6rem;
+      line-height: 1;
+      color: var(--pink)
+    }
+
     .chip[aria-pressed=true] {
       color: var(--selink);
       box-shadow: 0 10px 18px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .35)
@@ -2850,6 +2860,8 @@
     var tk = function (n) { return "৳" + n.toLocaleString("en-IN") }, cart = [], wish = [], sel = 0, oi = -1, qty = 1, step = 0, mode = "cart", promo = false;
     try { cart = JSON.parse(localStorage.getItem("sxc2") || "[]") || []; wish = JSON.parse(localStorage.getItem("sxw2") || "[]") || [] } catch (e) { }
     function save() { try { localStorage.setItem("sxc2", JSON.stringify(cart)); localStorage.setItem("sxw2", JSON.stringify(wish)) } catch (e) { } }
+    function wk(p, o) { if (o === undefined) o = oi; return p.opts && o >= 0 ? p.id + ":" + o : p.id }
+    function wparse(k) { var a = String(k).split(":"), p = pid(a[0]); if (!p) return null; var o = a.length > 1 ? +a[1] : -1; if (o >= 0 && !(p.opts && p.opts[o])) return null; return { p: p, o: o } }
     function pid(id) { return P.filter(function (p) { return p.id == id })[0] }
     function toast(m) { var t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t.h); t.h = setTimeout(function () { t.classList.remove("show") }, 1800) }
     /* theme */
@@ -2878,10 +2890,10 @@
       seg.scrollTo({ left: Math.max(0, b.offsetLeft - (seg.clientWidth - b.offsetWidth) / 2), behavior: anim ? "smooth" : "auto" })
     }
     function pdp(ni) {
-      var p = P[sel], w = wish.indexOf(p.id) > -1;
+      var p = P[sel], w = wish.indexOf(wk(p)) > -1, wl = p.opts && oi >= 0 ? p.opts[oi] : "";
       if (!ni) $("#gi").src = pimg(p, oi); $("#gi").alt = p.n;
-      $("#pi").innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center"><span class="mono pink">' + p.cat + '</span><button class="dsq" id="wb" aria-label="Save to wishlist" aria-pressed="' + w + '" style="' + (w ? "color:var(--pink)" : "") + '"><svg class="ic" style="' + (w ? "fill:currentColor" : "") + '"><use href="#i-heart"/></svg></button></div><h2 class="disp gtext">' + p.n + '</h2><div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span class="price">' + tk(p.p) + '</span><span class="stock mono"><i></i>In stock · Ready to dispatch</span></div><p class="mute" style="line-height:1.65">' + p.d + "</p>" +
-        (p.opts ? '<div><div class="mono mute" style="margin-bottom:10px">Choose fragrance</div><div class="chips" id="chips">' + p.opts.map(function (o, i) { return '<button class="chip" data-o="' + i + '" aria-pressed="' + (i == oi) + '">' + o + "</button>" }).join("") + "</div></div>" : "") +
+      $("#pi").innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center"><span class="mono pink">' + p.cat + '</span><span style="display:flex;align-items:center;gap:10px;min-width:0">' + (wl ? '<span class="mono mute" id="wlab" style="font-size:.64rem;text-align:right;line-height:1.3">Save · ' + wl + "</span>" : "") + '<button class="dsq" id="wb" aria-label="Save ' + (wl || "product") + ' to wishlist" aria-pressed="' + w + '" style="' + (w ? "color:var(--pink)" : "") + '"><svg class="ic" style="' + (w ? "fill:currentColor" : "") + '"><use href="#i-heart"/></svg></button></span></div><h2 class="disp gtext">' + p.n + '</h2><div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span class="price">' + tk(p.p) + '</span><span class="stock mono"><i></i>In stock · Ready to dispatch</span></div><p class="mute" style="line-height:1.65">' + p.d + "</p>" +
+        (p.opts ? '<div><div class="mono mute" style="margin-bottom:10px">Choose fragrance</div><div class="chips" id="chips">' + p.opts.map(function (o, i) { return '<button class="chip' + (wish.indexOf(p.id + ":" + i) > -1 ? " wl" : "") + '" data-o="' + i + '" aria-pressed="' + (i == oi) + '">' + o + "</button>" }).join("") + "</div></div>" : "") +
         '<div class="buy"><div class="qty"><button class="qb" id="qm" aria-label="Less"><svg class="ic"><use href="#i-minus"/></svg></button><output id="qv">' + qty + '</output><button class="qb" id="qp" aria-label="More"><svg class="ic"><use href="#i-plus"/></svg></button></div><button class="btn btn-c" id="add"><svg class="ic"><use href="#i-bag"/></svg>Add to cart</button></div><button class="btn btn-g" id="inst" style="width:100%">Instant 1-click checkout</button><ul class="feat"><li><svg class="ic"><use href="#i-check"/></svg>Cash on delivery, bKash &amp; Nagad</li><li><svg class="ic"><use href="#i-check"/></svg>30-day easy returns</li></ul>'
     }
     var RM = window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches, EZ = "cubic-bezier(.2,.9,.3,1)";
@@ -3005,10 +3017,10 @@
     $("#seg").onclick = function (e) { var b = e.target.closest("button"); if (!b) return; if (b.dataset.all) { catf = ""; segRender(); return } pick(+b.dataset.s) };
     $("#pi").onclick = function (e) {
       var b = e.target.closest("button"); if (!b) return;
-      if (b.dataset.o !== undefined) { oi = +b.dataset.o; $$("#chips .chip").forEach(function (c, i) { c.setAttribute("aria-pressed", i == oi) }); varImg(1) }
+      if (b.dataset.o !== undefined) { oi = +b.dataset.o; $$("#chips .chip").forEach(function (c, i) { c.setAttribute("aria-pressed", i == oi) }); varImg(1); pdp(true) }
       else if (b.id == "qm") { qty = Math.max(1, qty - 1); $("#qv").textContent = qty } else if (b.id == "qp") { qty = Math.min(20, qty + 1); $("#qv").textContent = qty }
       else if (b.id == "add") { if (addItem()) toast("Added to bag") } else if (b.id == "inst") { if (addItem()) { step = 1; openSheet("cart") } }
-      else if (b.id == "wb") { toggleW(P[sel].id); pdp() }
+      else if (b.id == "wb") { toggleW(wk(P[sel])); pdp(true) }
     };
     function toggleW(id) { var i = wish.indexOf(id); i > -1 ? wish.splice(i, 1) : wish.push(id); save(); badges(); toast(i > -1 ? "Removed from wishlist" : "Saved to wishlist") }
     /* cart */
@@ -3034,7 +3046,7 @@
       var sb = $("#sb"), sf = $("#sf");
       if (mode == "wish") {
         $("#sh").textContent = "Wishlist"; sf.innerHTML = "";
-        sb.innerHTML = wish.length ? wish.map(function (id) { var p = pid(id); return '<div class="line"><img src="' + p.img + '" alt=""><div><b>' + p.n + "</b><br><small>" + tk(p.p) + '</small></div><div class="ctl"><button class="btn btn-w" style="height:40px;padding:0 18px;font-size:.78rem" data-v="' + id + '">View</button><button class="lk" data-w="' + id + '">Remove</button></div></div>' }).join("") : '<div class="empty"><svg class="ic" style="width:40px;height:40px"><use href="#i-heart"/></svg><b>No saved items yet</b><span>Tap the heart on a product to save it.</span></div>'; return
+        sb.innerHTML = wish.length ? wish.map(function (k) { var x = wparse(k); if (!x) return ""; var p = x.p, nm = p.n + (x.o >= 0 ? " · " + p.opts[x.o] : ""); return '<div class="line"><img src="' + pimg(p, x.o) + '" alt=""><div><b>' + nm + "</b><br><small>" + tk(p.p) + '</small></div><div class="ctl"><button class="btn btn-w" style="height:40px;padding:0 18px;font-size:.78rem" data-v="' + k + '">View</button><button class="lk" data-w="' + k + '">Remove</button></div></div>' }).join("") : '<div class="empty"><svg class="ic" style="width:40px;height:40px"><use href="#i-heart"/></svg><b>No saved items yet</b><span>Tap the heart on a product to save it.</span></div>'; return
       }
       if (!cart.length) { $("#sh").textContent = "Your bag"; sb.innerHTML = '<div class="empty"><svg class="ic" style="width:40px;height:40px"><use href="#i-bag"/></svg><b>Your bag is empty</b><button class="btn btn-g" data-close>Keep shopping</button></div>'; sf.innerHTML = ""; return }
       if (promo && sub() < +promo.min) { promo = false; toast("Promo removed · minimum order not met") }
@@ -3076,8 +3088,8 @@
     $("#sb").onclick = function (e) {
       var b = e.target.closest("button"); if (!b) return; var d = b.dataset;
       if (d.close !== undefined) { closeAll(); return }
-      if (d.v) { closeAll(); pick(P.indexOf(pid(d.v)), true); return }
-      if (d.w) { wish.splice(wish.indexOf(d.w), 1); save(); badges(); pdp(); render(); return }
+      if (d.v) { var x = wparse(d.v); if (x) { closeAll(); pick(P.indexOf(x.p), true, x.o >= 0 ? x.o : undefined) } return }
+      if (d.w) { wish.splice(wish.indexOf(d.w), 1); save(); badges(); pdp(true); render(); return }
       if (d.m !== undefined) { var c = cart[+d.m]; c.q--; if (c.q < 1) cart.splice(+d.m, 1) }
       else if (d.p !== undefined) { cart[+d.p].q = Math.min(20, cart[+d.p].q + 1) }
       else if (d.r !== undefined) { cart.splice(+d.r, 1) } else return;
